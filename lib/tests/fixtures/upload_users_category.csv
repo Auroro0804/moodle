@@ -1,0 +1,3 @@
+username,password,firstname,lastname,email,category1,categoryrole1,course1,role1
+jonest,verysecret,Tom,Jones,jonest@example.com,MGMT,manager,management1,student
+reznor,somesecret,Trent,Reznor,reznor@example.com,MGMT,manager,management1,student

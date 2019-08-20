@@ -1,10 +1,9 @@
-@tool @tool_uploaduser @_file_upload
+@tool @tool_uploaduser @javascript @_file_upload
 Feature: Upload users
   In order to add users to the system
   As an admin
   I need to upload files containing the users data
 
-  @javascript
   Scenario: Upload users enrolling them on courses and groups
     Given the following "courses" exist:
       | fullname | shortname | category |
@@ -38,7 +37,6 @@ Feature: Upload users
     And I set the field "groups" to "Section 1 (1)"
     And the "members" select box should contain "Tom Jones"
 
-  @javascript
   Scenario: Upload users enrolling them on courses and groups applying defaults
     Given the following "courses" exist:
       | fullname | shortname | category |
@@ -63,7 +61,6 @@ Feature: Upload users
     And the field "City/town" matches value "Brighton"
     And the field "Department" matches value "Purchasing"
 
-  @javascript
   Scenario: Upload users with custom profile fields
     # Create user profile field.
     Given I log in as "admin"
@@ -85,7 +82,6 @@ Feature: Upload users
     And I should see "The big guy"
     And I log out
 
-  @javascript
   Scenario: Upload users setting their user theme
     Given the following "courses" exist:
       | fullname | shortname | category |
@@ -146,7 +142,6 @@ Feature: Upload users
     And I press "Continue"
     And I log out
 
-  @javascript
   Scenario: Upload users setting their enrol date and period
     Given the following "courses" exist:
       | fullname | shortname | category |
@@ -171,3 +166,42 @@ Feature: Upload users
     And I should see "12 January 2020" in the "Enrolment ends" "table_row"
     And I click on "Close" "button"
     And I log out
+  
+  Scenario: Upload users enrolling them on courses and assign category roles
+    Given the following "courses" exist:
+      | fullname | shortname |
+      | management1 | management1 |
+    And the following "categories" exist:
+      | name | idnumber |
+      | MGMT | MGMT |
+    And I log in as "admin"
+    And I navigate to "Users > Accounts >Upload users" in site administration
+    When I upload "lib/tests/fixtures/upload_users_category.csv" file to "File" filemanager
+    And I press "Upload users"
+    Then I should see "Upload users preview"
+    And I should see "Tom"
+    And I should see "Jones"
+    And I should see "Trent"
+    And I should see "Reznor"
+    And I should see "MGMT"
+    And I should see "manager"
+    And I should see "student"
+    And I should see "management1"
+    And I press "Upload users"
+    And I press "Continue"
+    And I navigate to "Users > Accounts > Browse list of users" in site administration
+    And I should see "Tom Jones"
+    And I should see "Trent Reznor"
+    And I should see "reznor@example.com"
+    And I am on "management1" course homepage
+    And I should see "Participants"
+    And I follow "Participants"
+    And I should see "Tom Jones"
+    And I should see "Trent Reznor"
+    And I should see "Student"
+    And I navigate to "Courses > Manage courses and categories" in site administration
+    And I open the action menu in "MGMT" "list_item"
+    And I choose "Assign roles" in the open action menu
+    And I should see "Manager"
+    And I should see "Tom Jones"
+    And I should see "Trent Reznor"
