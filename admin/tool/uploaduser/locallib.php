@@ -359,36 +359,19 @@ function uu_allowed_roles() {
  * Returns mapping of all roles using short role name as index.
  * @return array
  */
-function uu_allowed_roles_cache() {
-    $allowedroles = get_assignable_roles(context_course::instance(SITEID), ROLENAME_SHORT);
+function uu_allowed_roles_cache($id = null) {
+    if($id == null) {
+        $id = SITEID;
+        $allowedroles = get_assignable_roles(context_course::instance($id), ROLENAME_SHORT);
+    } else {
+        $allowedroles = get_assignable_roles(context_coursecat::instance($id), ROLENAME_SHORT);
+    }
     $rolecache = [];
     foreach ($allowedroles as $rid=>$rname) {
         $rolecache[$rid] = new stdClass();
         $rolecache[$rid]->id   = $rid;
         $rolecache[$rid]->name = $rname;
         if (!is_numeric($rname)) { // only non-numeric shortnames are supported!!!
-            $rolecache[$rname] = new stdClass();
-            $rolecache[$rname]->id   = $rid;
-            $rolecache[$rname]->name = $rname;
-        }
-    }
-    return $rolecache;
-}
-
-/**
- * Returns mapping of all category roles using short role name as index.
- * @return array
- */
-function uu_allowed_category_roles_cache() {
-    global $DB;
-    $courcatid = false;
-    $courcatid = $DB->get_field('course_categories', 'id', array(), $strictness = IGNORE_MULTIPLE);
-    $allowedroles = get_assignable_roles(context_coursecat::instance($courcatid), ROLENAME_SHORT);
-    foreach ($allowedroles as $rid => $rname) {
-        $rolecache[$rid] = new stdClass();
-        $rolecache[$rid]->id   = $rid;
-        $rolecache[$rid]->name = $rname;
-        if (!is_numeric($rname)) { // Only non-numeric shortnames are supported!!
             $rolecache[$rname] = new stdClass();
             $rolecache[$rname]->id   = $rid;
             $rolecache[$rname]->name = $rname;

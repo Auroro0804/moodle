@@ -189,7 +189,7 @@ if ($formdata = $mform2->is_cancelled()) {
     // caches
     $ccache         = array(); // course cache - do not fetch all courses here, we  will not probably use them all anyway!
     $cohorts        = array();
-    $categoryrolecache  = uu_allowed_category_roles_cache();// Category roles lookup.
+    $categoryrolecache = array();
     $categorycache  = array(); // Category cache - do not fetch all categories here, we will not probably use them all.
     $rolecache      = uu_allowed_roles_cache(); // Course roles lookup cache.
     $sysrolecache   = uu_allowed_sysroles_cache(); // System roles lookup cache.
@@ -963,12 +963,13 @@ if ($formdata = $mform2->is_cancelled()) {
                     continue;
                 }
                 if (!array_key_exists($categoryidnumber, $categorycache)) {
-                    $category = $DB->get_records('course_categories', array('idnumber' => $categoryidnumber), 'id, idnumber');
+                    $category = $DB->get_record('course_categories', array('idnumber' => $categoryidnumber), 'id, idnumber');
+                    $categoryrolecache[$categoryidnumber] = uu_allowed_roles_cache($category->id);
                     if (count($category) != 1) {
                         $upt->track('enrolments', get_string('unknowncategory', 'error', s($categoryidnumber)), 'error');
                         continue;
                     }
-                    $categoryobj = core_course_category::get(reset($category)->id);
+                    $categoryobj = core_course_category::get($category->id);
                     $context = context_coursecat::instance($categoryobj->id);
                     $categorycache[$categoryidnumber] = $context;
                 }
@@ -976,8 +977,8 @@ if ($formdata = $mform2->is_cancelled()) {
                 $roleid = false;
                 if (!empty($user->{'categoryrole'.$j})) {
                     $rolename = $user->{'categoryrole'.$j};
-                    if (array_key_exists($rolename, $categoryrolecache)) {
-                        $roleid = $categoryrolecache[$rolename]->id;
+                    if (array_key_exists($rolename, $categoryrolecache[$categoryidnumber])) {
+                        $roleid = $categoryrolecache[$categoryidnumber][$rolename]->id;
                     } else {
                         $upt->track('enrolments', get_string('unknownrole', 'error', s($rolename)), 'error');
                         continue;
